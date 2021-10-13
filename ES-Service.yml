@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: default #change as per environment
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
