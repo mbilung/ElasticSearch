@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: your-namespace
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      affinity:
+       nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: "elastic"
+             operator: In
+             values:
+             - "dev" #change as per environment dev, qa, uat
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: azure-managed-disk
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9200
+          name: http
+        env:
+        - name: discovery.type
+          value: single-node
+        - name: ES_JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        - name: network.host
+          value: "0.0.0.0"
+        volumeMounts:
+        - mountPath: "/usr/share/elasticsearch/data"
+          name: volume
+      initContainers:
+      - name: init-myservice
+        image: busybox:1.28
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: volume
+          mountPath: "/usr/share/elasticsearch/data"
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+      - name: tcp-transmission-settings
+        image: busybox
+        command: ["sysctl", "-w", "net.ipv4.tcp_retries2=3"]
+        securityContext:
+          privileged: true      
+      tolerations:
+      - key: "service"
+        operator: "Equal"
+        value: "elk"
+        effect: "NoSchedule"
