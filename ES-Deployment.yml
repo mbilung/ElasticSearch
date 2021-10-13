@@ -15,7 +15,7 @@ spec:
       labels:
         app: elasticsearch
     spec:
-      affinity:
+      affinity: #define affinty on the AKS nodes before passing the below values
        nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
          nodeSelectorTerms:
@@ -70,7 +70,7 @@ spec:
         command: ["sysctl", "-w", "net.ipv4.tcp_retries2=3"]
         securityContext:
           privileged: true      
-      tolerations:
+      tolerations: #define tolerations on the node before passing the below values
       - key: "service"
         operator: "Equal"
         value: "elk"
