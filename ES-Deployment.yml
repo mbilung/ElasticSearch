@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: your-namespace
+  namespace: default #change as per environment
   name: elasticsearch
   labels:
     app: elasticsearch
@@ -23,7 +23,7 @@ spec:
            - key: "elastic"
              operator: In
              values:
-             - "dev" #change as per environment dev, qa, uat
+             - "dev" #change as per environment
       volumes:
         - name: volume
           persistentVolumeClaim:
