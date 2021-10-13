@@ -9,5 +9,5 @@ What does each file do?
 4. ES-Service.yml: Exposes elasticsearch through port 9200
 </p>
 
-How to access elasticsearch from your local
-kubectl port-forward service/elasticsearch 8080:9200
+How to access elasticsearch from your local:</br>
+>kubectl port-forward service/elasticsearch 8080:9200
